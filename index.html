@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Collaborative Editor</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+
+    #editor {
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 16px;
+      background: white;
+      resize: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>Real-time Collaborative Editor</h2>
+  <textarea id="editor" placeholder="Start typing..."></textarea>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const editor = document.getElementById('editor');
+
+    let selfChange = false;
+
+    editor.addEventListener('input', () => {
+      selfChange = true;
+      socket.emit('text-change', editor.value);
+    });
+
+    socket.on('text-update', (data) => {
+      if (!selfChange) {
+        editor.value = data;
+      }
+      selfChange = false;
+    });
+  </script>
+</body>
+</html>
